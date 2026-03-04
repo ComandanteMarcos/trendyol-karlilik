@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#120C02">
+<title>İskender Tesbih — Karlılık</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #120C02;
+    --surface:   #1C1306;
+    --surface2:  #261A08;
+    --surface3:  #311F09;
+    --gold:      #D4A843;
+    --gold-lt:   #F0CC7A;
+    --gold-dim:  #7A5C1E;
+    --gold-glow: rgba(212,168,67,0.12);
+    --text:      #F5EDD8;
+    --muted:     #8A7048;
+    --border:    rgba(212,168,67,0.15);
+    --border-act:rgba(212,168,67,0.45);
+    --green:     #6EC97A;
+    --red:       #E07878;
+    --safe:      48px;
+  }
+
+  html.light {
+    --bg:        #FAF5EB;
+    --surface:   #FFFFFF;
+    --surface2:  #F5EDD8;
+    --surface3:  #EDE0C4;
+    --gold:      #9A6E0A;
+    --gold-lt:   #7A5508;
+    --gold-dim:  #C9A84C;
+    --gold-glow: rgba(154,110,10,0.08);
+    --text:      #1C1306;
+    --muted:     #8A7048;
+    --border:    rgba(154,110,10,0.18);
+    --border-act:rgba(154,110,10,0.5);
+    --green:     #2A7D35;
+    --red:       #B52828;
+  }
+
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    min-height: 100%; background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overscroll-behavior: none;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  body {
+    background-image: radial-gradient(ellipse at 50% -10%, rgba(212,168,67,0.07) 0%, transparent 55%);
+  }
+
+  .page { max-width: 480px; margin: 0 auto; padding: 0 0 60px; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    padding: 48px 18px 22px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .theme-btn {
+    position: absolute; top: 14px; right: 16px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 50%; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; cursor: pointer; -webkit-appearance: none;
+    transition: border-color 0.2s;
+  }
+
+  .brand {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; font-weight: 500; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
+  }
+
+  .title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 900; line-height: 1.1; color: var(--text);
+  }
+  .title em { color: var(--gold); font-style: italic; font-weight: 700; }
+
+  /* ── BÖLÜM ── */
+  .section { padding: 18px 16px 0; }
+
+  .sec-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 10px; padding-left: 2px;
+  }
+
+  /* ── AYAR BUTONLARI ── */
+  .ayar-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+
+  .ayar-btn {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 13px 6px 11px;
+    min-height: var(--safe); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    transition: all 0.15s; -webkit-appearance: none;
+  }
+  .ayar-btn .bn { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .ayar-btn .bh { font-size: 10px; color: var(--gold-dim); font-family: 'DM Sans', sans-serif; }
+  .ayar-btn.active { background: var(--gold-glow); border-color: var(--gold); }
+  .ayar-btn.active .bn { color: var(--gold-lt); }
+  .ayar-btn.active .bh { color: var(--gold); }
+
+  /* ── INPUT KARTLAR ── */
+  .inp-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .inp-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 13px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    min-height: 60px; transition: border-color 0.15s;
+    cursor: text;
+  }
+  .inp-card:focus-within { border-color: var(--border-act); }
+
+  /* Tüm karta tıklayınca input focus olsun */
+  .inp-card label {
+    display: flex; justify-content: space-between; align-items: center;
+    width: 100%; cursor: text;
+  }
+
+  .inp-card .lbl {
+    font-size: 13px; font-weight: 600; color: var(--text); flex-shrink: 0;
+    max-width: 55%; pointer-events: none;
+  }
+  .inp-card .lbl small {
+    display: block; font-size: 10px; font-weight: 400; color: var(--muted); margin-top: 1px;
+  }
+
+  .inp-right { display: flex; align-items: center; gap: 6px; }
+
+  .inp-card input {
+    background: transparent; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 22px; font-weight: 700; color: var(--text);
+    text-align: right; width: 110px;
+    -moz-appearance: textfield; -webkit-appearance: none; border-radius: 0;
+  }
+  .inp-card input::-webkit-inner-spin-button,
+  .inp-card input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .inp-card input::placeholder { color: var(--muted); font-weight: 400; }
+
+  .inp-unit {
+    font-size: 11px; font-weight: 500; color: var(--muted); white-space: nowrap;
+  }
+
+  /* ── SLIDER (sepet indirimi) ── */
+  .slider-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px 16px;
+    transition: border-color 0.15s;
+  }
+  .slider-card:focus-within { border-color: var(--border-act); }
+
+  .slider-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .slider-top .lbl { font-size: 13px; font-weight: 600; color: var(--text); }
+  .slider-val {
+    font-size: 22px; font-weight: 700; color: var(--gold);
+    font-family: 'DM Sans', sans-serif; min-width: 56px; text-align: right;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 4px; border-radius: 4px; outline: none;
+    background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--pct, 5%), var(--surface3) var(--pct, 5%), var(--surface3) 100%);
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--gold); cursor: pointer;
+    box-shadow: 0 2px 8px rgba(212,168,67,0.4);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 24px; height: 24px; border-radius: 50%; border: none;
+    background: var(--gold); cursor: pointer;
+  }
+  .slider-ticks {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; padding: 0 2px;
+    font-size: 10px; color: var(--muted);
+  }
+
+  /* Haremaltın linki */
+  .harem-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    text-decoration: none; transition: border-color 0.2s;
+    font-size: 12px; color: var(--muted);
+  }
+  .harem-link strong { color: var(--gold); font-weight: 600; }
+  .harem-link .arrow { margin-left: auto; color: var(--gold-dim); font-size: 15px; }
+
+  /* ── AYRAÇ ── */
+  .divider {
+    margin: 18px 16px 0;
+    height: 1px; background: var(--border);
+    position: relative;
+  }
+  .divider::after {
+    content: '◆';
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    background: var(--bg); padding: 0 10px;
+    color: var(--gold-dim); font-size: 10px;
+    transition: background 0.3s;
+  }
+
+  /* ── SONUÇ KARTI ── */
+  .result-wrap { padding: 18px 16px 0; }
+
+  .result-card {
+    background: linear-gradient(150deg, var(--surface2) 0%, var(--surface) 100%);
+    border: 1px solid var(--border-act);
+    border-radius: 16px; overflow: hidden; position: relative;
+  }
+  .result-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* Net kâr hero */
+  .kar-hero {
+    text-align: center; padding: 26px 20px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .kh-lbl {
+    font-size: 10px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+  }
+  .kh-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px; font-weight: 900; line-height: 1;
+    transition: color 0.25s;
+  }
+  .kh-val.pos { color: var(--green); }
+  .kh-val.neg { color: var(--red); }
+  .kh-pct {
+    font-size: 13px; color: var(--muted); margin-top: 6px; font-weight: 400;
+  }
+
+  /* 3 metrik */
+  .metrics {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    border-bottom: 1px solid var(--border);
+  }
+  .met {
+    padding: 14px 8px; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .met:last-child { border-right: none; }
+  .met .ml { font-size: 9px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .met .mv { font-size: 14px; font-weight: 700; color: var(--text); }
+
+  /* Detay */
+  .detay { padding: 14px 16px 18px; }
+  .det-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 10px;
+  }
+  html.light .det-row { border-bottom-color: rgba(0,0,0,0.05); }
+  .det-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .dk { font-size: 12px; color: var(--muted); flex: 1; line-height: 1.4; }
+  .dv { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; flex-shrink: 0; }
+  .det-row.net .dk { color: var(--text); font-weight: 600; font-size: 13px; }
+  .det-row.net .dv { font-size: 16px; }
+
+  .uyari {
+    margin: 0 16px; padding: 10px 14px;
+    background: rgba(224,120,120,0.1); border: 1px solid rgba(224,120,120,0.3);
+    border-radius: 8px; font-size: 11px; color: var(--red);
+    text-align: center; display: none;
+  }
+
+  .spacer { height: 18px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">
+      <span id="themeIcon">☀️</span>
+    </button>
+    <div class="brand">İskender Tesbih</div>
+    <div class="title">Trendyol<br><em>Karlılık</em> Hesaplayıcı</div>
+  </div>
+
+  <!-- ALTIN AYARI -->
+  <div class="section" style="margin-top:6px;">
+    <div class="sec-label">Altın Ayarı</div>
+    <div class="ayar-row">
+      <button class="ayar-btn active" data-has="0.585">
+        <span class="bn">14 Ayar</span><span class="bh">0.585</span>
+      </button>
+      <button class="ayar-btn" data-has="0.750">
+        <span class="bn">18 Ayar</span><span class="bh">0.750</span>
+      </button>
+      <button class="ayar-btn" data-has="0.916">
+        <span class="bn">22 Ayar</span><span class="bh">0.916</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ÜRÜN BİLGİLERİ -->
+  <div class="section" style="margin-top:16px;">
+    <div class="sec-label">Ürün Bilgileri</div>
+    <div class="inp-list">
+
+      <div class="inp-card">
+        <label>
+          <span class="lbl">Ürün Gramı</span>
+          <div class="inp-right">
+            <input type="number" id="gram" value="" placeholder="0.00" step="0.01" min="0" inputmode="decimal">
+            <span class="inp-unit">gr</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="inp-card">
+        <label>
+          <span class="lbl">Satış Gram Fiyatı<small>₺/gram olarak</small></span>
+          <div class="inp-right">
+            <input type="number" id="satisGramFiyat" value="8500" step="10" min="0" inputmode="numeric">
+            <span class="inp-unit">₺/gr</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="inp-card">
+        <label>
+          <span class="lbl">Has Altın Fiyatı<small>Piyasa satış fiyatı</small></span>
+          <div class="inp-right">
+            <input type="number" id="hasAltin" value="" placeholder="—" step="10" min="0" inputmode="numeric">
+            <span class="inp-unit">₺/gr</span>
+          </div>
+        </label>
+      </div>
+
+      <a class="harem-link" href="https://www.haremaltin.com/" target="_blank">
+        <span>📈</span>
+        <span>Güncel has altın fiyatı için <strong>kontrol edin</strong></span>
+        <span class="arrow">↗</span>
+      </a>
+
+      <div class="inp-card">
+        <label>
+          <span class="lbl">İşçilik Milyemi</span>
+          <div class="inp-right">
+            <input type="number" id="iscilik" value="" placeholder="0" step="1" min="0" inputmode="numeric">
+            <span class="inp-unit">milyem</span>
+          </div>
+        </label>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TRENDYOL PARAMETRELERİ -->
+  <div class="section" style="margin-top:16px;">
+    <div class="sec-label">Trendyol Parametreleri</div>
+    <div class="inp-list">
+
+      <!-- Sepet indirimi slider -->
+      <div class="slider-card">
+        <div class="slider-top">
+          <span class="lbl">Sepet İndirimi</span>
+          <span class="slider-val" id="indirim-val">%5</span>
+        </div>
+        <input type="range" id="indirim" min="0" max="50" step="1" value="5" style="--pct:10%">
+        <div class="slider-ticks">
+          <span>%0</span><span>%10</span><span>%20</span><span>%30</span><span>%40</span><span>%50</span>
+        </div>
+      </div>
+
+      <div class="inp-card">
+        <label>
+          <span class="lbl">Trendyol Komisyonu<small>KDV dahil</small></span>
+          <div class="inp-right">
+            <input type="number" id="komisyon" value="18.10" step="0.01" min="0" inputmode="decimal">
+            <span class="inp-unit">%</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="inp-card">
+        <label>
+          <span class="lbl">KDV Oranı<small>İşçilik üzeri</small></span>
+          <div class="inp-right">
+            <input type="number" id="kdv" value="20" step="1" min="0" inputmode="numeric">
+            <span class="inp-unit">%</span>
+          </div>
+        </label>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SONUÇLAR -->
+  <div class="result-wrap">
+    <div class="result-card">
+
+      <div class="kar-hero">
+        <div class="kh-lbl">Net Kâr</div>
+        <div class="kh-val pos" id="r-kar">—</div>
+        <div class="kh-pct" id="r-pct">—</div>
+      </div>
+
+      <div class="metrics">
+        <div class="met">
+          <div class="ml">Satış</div>
+          <div class="mv" id="r-satis">—</div>
+        </div>
+        <div class="met">
+          <div class="ml">Maliyet</div>
+          <div class="mv" id="r-maliyet">—</div>
+        </div>
+        <div class="met">
+          <div class="ml">Marj</div>
+          <div class="mv" id="r-marj">—</div>
+        </div>
+      </div>
+
+      <div class="detay">
+        <div class="det-row">
+          <span class="dk">Liste satış fiyatı</span>
+          <span class="dv" id="d-liste">—</span>
+        </div>
+        <div class="det-row">
+          <span class="dk">İndirimli satış fiyatı</span>
+          <span class="dv" id="d-indirimli">—</span>
+        </div>
+        <div class="det-row">
+          <span class="dk">Has altın maliyeti</span>
+          <span class="dv" id="d-has">—</span>
+        </div>
+        <div class="det-row">
+          <span class="dk">İşçilik maliyeti</span>
+          <span class="dv" id="d-iscilik">—</span>
+        </div>
+        <div class="det-row">
+          <span class="dk">İşçilik KDV'si</span>
+          <span class="dv" id="d-kdv">—</span>
+        </div>
+        <div class="det-row">
+          <span class="dk">Trendyol komisyonu</span>
+          <span class="dv" id="d-komisyon">—</span>
+        </div>
+        <div class="det-row net">
+          <span class="dk">Net Kâr</span>
+          <span class="dv" id="d-net">—</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+  <div class="uyari" id="uyari">⚠ Değerleri kontrol edin — zarar söz konusu olabilir</div>
+  <div class="spacer"></div>
+
+</div>
+<script>
+  const $ = id => document.getElementById(id);
+  let seciliHas = 0.585;
+  let isLight = false;
+
+  // Ayar butonları
+  document.querySelectorAll('.ayar-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ayar-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      seciliHas = parseFloat(btn.dataset.has);
+      hesapla();
+    });
+  });
+
+  // Slider — sepet indirimi
+  const slider = $('indirim');
+  function updateSlider() {
+    const val = parseFloat(slider.value);
+    const pct = (val / 50 * 100).toFixed(2) + '%';
+    slider.style.setProperty('--pct', pct);
+    $('indirim-val').textContent = '%' + val;
+    hesapla();
+  }
+  slider.addEventListener('input', updateSlider);
+  slider.addEventListener('change', updateSlider);
+  updateSlider();
+
+  // Diğer input event'leri
+  ['gram','satisGramFiyat','hasAltin','iscilik','komisyon','kdv'].forEach(id => {
+    $(id).addEventListener('input',  hesapla);
+    $(id).addEventListener('change', hesapla);
+    $(id).addEventListener('blur',   hesapla);
+  });
+
+  function fmt(val) {
+    return val.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' ₺';
+  }
+  function fmtD(val) {
+    return val.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺';
+  }
+
+  function hesapla() {
+    const gram           = parseFloat($('gram').value)           || 0;
+    const satisGramFiyat = parseFloat($('satisGramFiyat').value) || 0;
+    const hasAltinPiyasa = parseFloat($('hasAltin').value)       || 0;
+    const iscilikMilyem  = (parseFloat($('iscilik').value)       || 0) / 1000;
+    const indirimOran    = parseFloat(slider.value) / 100;
+    const komisyonOran   = (parseFloat($('komisyon').value)      || 0) / 100;
+    const kdvOran        = (parseFloat($('kdv').value)           || 0) / 100;
+
+    const listeFiyat    = gram * satisGramFiyat;
+    const satisFiyat    = listeFiyat * (1 - indirimOran);
+    const hasAltinMaliy = gram * seciliHas * hasAltinPiyasa;
+    const iscilikMaliy  = gram * iscilikMilyem * hasAltinPiyasa;
+    const iscilikKdv    = iscilikMaliy * kdvOran;
+    const komisyon      = satisFiyat * komisyonOran;
+    const toplamMaliyet = hasAltinMaliy + iscilikMaliy + iscilikKdv + komisyon;
+    const netKar        = satisFiyat - toplamMaliyet;
+    const marj          = satisFiyat > 0 ? (netKar / satisFiyat * 100) : 0;
+
+    const karEl = $('r-kar');
+    karEl.textContent = fmt(netKar);
+    karEl.className   = 'kh-val ' + (netKar >= 0 ? 'pos' : 'neg');
+    $('r-pct').textContent = marj.toFixed(1) + '% kâr marjı';
+
+    $('r-satis').textContent   = fmt(satisFiyat);
+    $('r-maliyet').textContent = fmt(toplamMaliyet);
+    $('r-marj').textContent    = '%' + marj.toFixed(1);
+
+    $('d-liste').textContent     = fmtD(listeFiyat);
+    $('d-indirimli').textContent = fmtD(satisFiyat);
+    $('d-has').textContent       = fmtD(hasAltinMaliy);
+    $('d-iscilik').textContent   = fmtD(iscilikMaliy);
+    $('d-kdv').textContent       = fmtD(iscilikKdv);
+    $('d-komisyon').textContent  = fmtD(komisyon);
+
+    const netEl = $('d-net');
+    netEl.textContent = fmtD(netKar);
+    netEl.style.color = netKar >= 0 ? 'var(--green)' : 'var(--red)';
+
+    $('uyari').style.display = netKar < 0 ? 'block' : 'none';
+  }
+
+  function toggleTheme() {
+    isLight = !isLight;
+    document.documentElement.classList.toggle('light', isLight);
+    $('themeIcon').textContent = isLight ? '🌙' : '☀️';
+    document.querySelector('meta[name="theme-color"]')
+      .setAttribute('content', isLight ? '#FAF5EB' : '#120C02');
+  }
+
+  hesapla();
+</script>
+</body>
+</html>
