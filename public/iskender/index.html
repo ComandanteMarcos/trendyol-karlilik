@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -168,33 +169,54 @@
 
   .slider-top {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 14px; gap: 12px;
   }
-  .slider-top .lbl { font-size: 13px; font-weight: 600; color: var(--text); }
-  .slider-val {
-    font-size: 22px; font-weight: 700; color: var(--gold);
-    font-family: 'DM Sans', sans-serif; min-width: 56px; text-align: right;
+  .slider-top .lbl { font-size: 13px; font-weight: 600; color: var(--text) !important; flex-shrink: 0; }
+
+  /* Manuel giriş + % yan yana */
+  .slider-input-wrap {
+    display: flex; align-items: center; gap: 4px;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 4px 10px 4px 6px;
+    transition: border-color 0.15s;
+  }
+  .slider-input-wrap:focus-within { border-color: var(--gold); }
+
+  .slider-manual {
+    background: transparent; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 20px; font-weight: 700; color: var(--text);
+    width: 44px; text-align: right;
+    -moz-appearance: textfield; -webkit-appearance: none;
+  }
+  .slider-manual::-webkit-inner-spin-button,
+  .slider-manual::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .slider-pct-sign {
+    font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0;
   }
 
   input[type=range] {
     -webkit-appearance: none; appearance: none;
-    width: 100%; height: 4px; border-radius: 4px; outline: none;
-    background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--pct, 5%), var(--surface3) var(--pct, 5%), var(--surface3) 100%);
+    width: 100%; height: 6px; border-radius: 6px; outline: none;
+    background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--pct, 10%), var(--surface3) var(--pct, 10%), var(--surface3) 100%);
     cursor: pointer;
+    /* Kayganlığı önle — yalnızca yatay hareket slider'ı kontrol etsin */
+    touch-action: none;
   }
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none; appearance: none;
-    width: 24px; height: 24px; border-radius: 50%;
+    width: 32px; height: 32px; border-radius: 50%;
     background: var(--gold); cursor: pointer;
-    box-shadow: 0 2px 8px rgba(212,168,67,0.4);
+    box-shadow: 0 2px 12px rgba(212,168,67,0.5);
+    /* Büyük thumb = kolay tutma, yanlışlıkla kayma azalır */
   }
   input[type=range]::-moz-range-thumb {
-    width: 24px; height: 24px; border-radius: 50%; border: none;
+    width: 32px; height: 32px; border-radius: 50%; border: none;
     background: var(--gold); cursor: pointer;
   }
   .slider-ticks {
     display: flex; justify-content: space-between;
-    margin-top: 6px; padding: 0 2px;
+    margin-top: 8px; padding: 0 2px;
     font-size: 10px; color: var(--muted);
   }
 
@@ -384,7 +406,10 @@
       <div class="slider-card">
         <div class="slider-top">
           <span class="lbl">Sepet İndirimi</span>
-          <span class="slider-val" id="indirim-val">%5</span>
+          <div class="slider-input-wrap">
+            <input type="number" class="slider-manual" id="indirim-manual" min="0" max="50" step="1" value="5" inputmode="numeric">
+            <span class="slider-pct-sign">%</span>
+          </div>
         </div>
         <input type="range" id="indirim" min="0" max="50" step="1" value="5" style="--pct:10%">
         <div class="slider-ticks">
@@ -496,18 +521,37 @@
     });
   });
 
-  // Slider — sepet indirimi
+  // Slider — sepet indirimi (iki yönlü)
   const slider = $('indirim');
-  function updateSlider() {
-    const val = parseFloat(slider.value);
-    const pct = (val / 50 * 100).toFixed(2) + '%';
-    slider.style.setProperty('--pct', pct);
-    $('indirim-val').textContent = '%' + val;
+  const manualInp = $('indirim-manual');
+
+  function updateSlider(val) {
+    val = Math.min(50, Math.max(0, Math.round(val)));
+    slider.value = val;
+    manualInp.value = val;
+    slider.style.setProperty('--pct', (val / 50 * 100).toFixed(1) + '%');
     hesapla();
   }
-  slider.addEventListener('input', updateSlider);
-  slider.addEventListener('change', updateSlider);
-  updateSlider();
+
+  slider.addEventListener('input', () => updateSlider(parseFloat(slider.value)));
+  slider.addEventListener('change', () => updateSlider(parseFloat(slider.value)));
+
+  manualInp.addEventListener('input', () => updateSlider(parseFloat(manualInp.value) || 0));
+  manualInp.addEventListener('change', () => updateSlider(parseFloat(manualInp.value) || 0));
+  manualInp.addEventListener('blur', () => updateSlider(parseFloat(manualInp.value) || 0));
+
+  // Mobilde yanlışlıkla kayma önleme:
+  // Kullanıcı slider'a bilinçli dokunana kadar sayfa scroll'u engelleme
+  let sliderActive = false;
+  slider.addEventListener('touchstart', (e) => {
+    sliderActive = true;
+  }, { passive: true });
+  slider.addEventListener('touchmove', (e) => {
+    if (sliderActive) e.stopPropagation();
+  }, { passive: true });
+  slider.addEventListener('touchend', () => { sliderActive = false; });
+
+  updateSlider(5);
 
   // Diğer input event'leri
   ['gram','satisGramFiyat','hasAltin','iscilik','komisyon','kdv'].forEach(id => {
